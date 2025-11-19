@@ -9,6 +9,10 @@ declare global {
 
 let pyodideReadyPromise: Promise<void> | null = null;
 
+// Using a newer, more stable version of Pyodide
+const PYODIDE_VERSION = "v0.26.2";
+const PYODIDE_BASE_URL = `https://cdn.jsdelivr.net/pyodide/${PYODIDE_VERSION}/full/`;
+
 // We use String.raw to treat backslashes literally in the Python source code string.
 const PYTHON_COMPARATOR_SCRIPT = String.raw`
 from sympy import simplify, trigsimp, parse_expr, Symbol, sin, cos, tan, cot, sec, csc, log, ln, sqrt, pi, exp, E
@@ -142,15 +146,23 @@ export const initPyodide = async () => {
 
   pyodideReadyPromise = (async () => {
     try {
+      // 1. Dynamically load the script if it's not available
       if (typeof window.loadPyodide !== 'function') {
-        throw new Error("Pyodide script is not loaded. Check internet connection or ad blocker.");
+        console.log("Loading Pyodide script...");
+        await new Promise<void>((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = `${PYODIDE_BASE_URL}pyodide.js`;
+            script.crossOrigin = "anonymous";
+            script.onload = () => resolve();
+            script.onerror = () => reject(new Error("Failed to load Pyodide script from CDN"));
+            document.head.appendChild(script);
+        });
       }
       
       console.log("Initializing Pyodide...");
-      // Explicitly set indexURL to the CDN base. This prevents Pyodide from trying to fetch .asm.js/.wasm from the local root
-      // which causes 404s or MIME type errors that bubble up as "Script error" in some contexts.
+      // Explicitly set indexURL to the CDN base.
       window.pyodideInstance = await window.loadPyodide({
-        indexURL: "https://cdn.jsdelivr.net/pyodide/v0.23.4/full/"
+        indexURL: PYODIDE_BASE_URL,
       });
       
       console.log("Loading SymPy package...");
