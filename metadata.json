@@ -1,0 +1,5 @@
+{
+  "name": "Desmos GraphGuesser",
+  "description": "A math game where AI generates a mystery curve, and you have to guess the equation that draws it.",
+  "requestFramePermissions": []
+}
