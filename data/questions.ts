@@ -6,7 +6,7 @@ export const QUESTIONS: Record<GameDifficulty, MysteryFunction[]> = {
     { latex: "y = x^2", description: "Standard Parabola", hint: "The most basic quadratic curve." },
     { latex: "y = \\sin(x)", description: "Sine Wave", hint: "Starts at 0, goes up to 1, down to -1." },
     { latex: "y = \\tan(x)", description: "Tangent", hint: "Repeating vertical asymptotes." },
-    { latex: "y = \\abs{x}", description: "Absolute Value", hint: "V-shaped graph." },
+    { latex: "y = \\abs(x)", description: "Absolute Value", hint: "V-shaped graph." },
     { latex: "y = 2x - 3", description: "Linear Equation", hint: "Slope is 2, y-intercept is -3." },
     { latex: "y = \\sqrt{x}", description: "Square Root", hint: "Only exists for positive x." },
     { latex: "y = \\round{x}", description: "_ - ", hint: "You Spin Me Round" }
@@ -46,7 +46,7 @@ export const QUESTIONS: Record<GameDifficulty, MysteryFunction[]> = {
       hint: "A smooth star-like curve with 4 rounded corners."
     },
     {
-      latex: "y = \\abs{\\sin x} + \\ln x",
+      latex: "y = \\abs(\\sin x) + \\ln x",
       description: "Absolute Sine with Log",
       hint: "Starts only for x > 0; oscillations sit on top of a rising log curve."
     },
