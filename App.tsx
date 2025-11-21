@@ -1,10 +1,15 @@
+
 import React, { useState, useCallback, useEffect } from 'react';
 import { DesmosGraph } from './components/DesmosGraph';
 import { Button } from './components/Button';
 import { MathInput } from './components/MathInput';
+import { SyntaxGuide } from './components/SyntaxGuide';
+import { TestRunner } from './components/TestRunner'; 
+import { InfoModal } from './components/InfoModal';
 import { getMysteryFunction, getDifficultyFromLevel, initializeQuestions, getTotalLevels } from './services/questionService';
 import { validateGuessWithPython, initPyodide } from './services/pythonService';
 import { AppStatus, GameDifficulty, GraphingCalculator, MysteryFunction } from './types';
+import { formatLatexForDesmos } from './utils/latexUtils';
 
 const App: React.FC = () => {
   const [calculator, setCalculator] = useState<GraphingCalculator | null>(null);
@@ -20,6 +25,9 @@ const App: React.FC = () => {
   const [feedback, setFeedback] = useState<string>('');
   const [attempts, setAttempts] = useState<number>(0);
   const [pythonReady, setPythonReady] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
+  const [showTests, setShowTests] = useState(false);
+  const [showInfo, setShowInfo] = useState(false); // State for InfoModal
 
   // Initialize Python Engine
   useEffect(() => {
@@ -67,7 +75,7 @@ const App: React.FC = () => {
       setStatus(AppStatus.COMPLETED);
       // Clear the graph for the victory screen
       if (calculator) {
-        calculator.setBlank();
+        try { calculator.setBlank(); } catch (e) { console.error(e); }
       }
       return;
     }
@@ -114,21 +122,26 @@ const App: React.FC = () => {
   };
 
   // Handle User Input Change (Live Plotting)
-  const handleInputChange = (latex: string) => {
-    setUserGuess(latex);
+  const handleInputChange = (rawInput: string) => {
+    setUserGuess(rawInput);
     
     if (calculator && status === AppStatus.PLAYING) {
-      // Plot user guess in real-time: Blue, Solid
-      if (!latex || latex.trim() === '') {
-        calculator.removeExpression('user_guess');
-      } else {
-        calculator.setExpression({
-          id: 'user_guess',
-          latex: latex,
-          color: '#6366f1', // Tailwind Indigo-500
-          lineStyle: 'SOLID',
-          lineWidth: 3
-        });
+      try {
+        if (!rawInput || rawInput.trim() === '') {
+          calculator.removeExpression('user_guess');
+        } else {
+          const formattedLatex = formatLatexForDesmos(rawInput);
+          calculator.setExpression({
+            id: 'user_guess',
+            latex: formattedLatex,
+            color: '#6366f1', // Tailwind Indigo-500
+            lineStyle: 'SOLID',
+            lineWidth: 3
+          });
+        }
+      } catch (e) {
+        // Ignore transient typing errors in Desmos
+        console.warn("Invalid graph syntax");
       }
     }
   };
@@ -140,7 +153,8 @@ const App: React.FC = () => {
     setStatus(AppStatus.CHECKING);
     
     try {
-      const result = await validateGuessWithPython(mysteryData.latex, userGuess);
+      const formattedGuess = formatLatexForDesmos(userGuess);
+      const result = await validateGuessWithPython(mysteryData.latex, formattedGuess);
       
       if (result.correct) {
         setStatus(AppStatus.WON);
@@ -178,11 +192,16 @@ const App: React.FC = () => {
   // Reset to menu
   const returnToMenu = () => {
     setStatus(AppStatus.IDLE);
-    if (calculator) calculator.setBlank();
+    if (calculator) {
+      try { calculator.setBlank(); } catch (e) { console.error(e); }
+    }
   };
 
   return (
     <div className="flex h-screen w-full bg-slate-950 text-slate-200 overflow-hidden">
+      <SyntaxGuide isOpen={showHelp} onClose={() => setShowHelp(false)} />
+      {showTests && <TestRunner onClose={() => setShowTests(false)} />}
+      <InfoModal isOpen={showInfo} onClose={() => setShowInfo(false)} />
       
       {/* Game Sidebar */}
       <aside className="w-96 flex-shrink-0 border-r border-slate-800 bg-slate-900/50 backdrop-blur flex flex-col h-full shadow-xl z-10">
@@ -346,13 +365,24 @@ const App: React.FC = () => {
                 </div>
 
                 <div className="space-y-3">
-                   <label className="block text-sm font-medium text-indigo-300">Your Guess</label>
+                   <div className="flex justify-between items-end">
+                     <label className="block text-sm font-medium text-indigo-300">Your Guess</label>
+                     <button 
+                       onClick={() => setShowHelp(true)}
+                       className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1"
+                     >
+                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                       </svg>
+                       Syntax Help
+                     </button>
+                   </div>
                    
                    <MathInput
                     value={userGuess}
                     onChange={handleInputChange}
                     disabled={status === AppStatus.WON || status === AppStatus.CHECKING}
-                    placeholder="y = x^2"
+                    placeholder="e.g. x^2 or sin(x)"
                    />
 
                    <div className="flex gap-2">
@@ -402,6 +432,24 @@ const App: React.FC = () => {
                    <div className="w-3 h-1 bg-indigo-500"></div> Your Guess
                 </div>
              </div>
+             
+             <div className="flex items-center justify-center gap-4 mt-3">
+                <button 
+                  onClick={() => setShowTests(true)} 
+                  className="text-[10px] text-slate-600 hover:text-slate-400 uppercase tracking-widest"
+                >
+                  Run Diagnostics
+                </button>
+             </div>
+
+             {/* Info Button */}
+             <button 
+                onClick={() => setShowInfo(true)}
+                className="w-full mt-3 py-2 flex items-center justify-center gap-2 text-xs font-medium text-slate-400 bg-slate-800/50 hover:bg-slate-800 hover:text-slate-200 border border-slate-700/50 rounded transition-all"
+             >
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                About & Contacts
+             </button>
         </div>
       </aside>
 

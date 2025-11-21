@@ -1,17 +1,18 @@
+
 import { GameDifficulty, MysteryFunction } from "../types";
 
 export const QUESTIONS: Record<GameDifficulty, MysteryFunction[]> = {
   [GameDifficulty.EASY]: [
+    { latex: "y = \\operatorname{round}(x)", description: "Rounding Function", hint: "A step function that jumps at .5 intervals." },
+    { latex: "y = \\sqrt{x}", description: "Square Root", hint: "Only exists for positive x." },
+    { latex: "y = \\operatorname{abs}(x)", description: "Absolute Value", hint: "V-shaped graph." },
     { latex: "y = x", description: "Identity Line", hint: "For every step right, you go one step up." },
     { latex: "y = x^2", description: "Standard Parabola", hint: "The most basic quadratic curve." },
     { latex: "y = \\sin(x)", description: "Sine Wave", hint: "Starts at 0, goes up to 1, down to -1." },
     { latex: "y = \\tan(x)", description: "Tangent", hint: "Repeating vertical asymptotes." },
-    { latex: "y = \\abs(x)", description: "Absolute Value", hint: "V-shaped graph." },
     { latex: "y = 2x - 3", description: "Linear Equation", hint: "Slope is 2, y-intercept is -3." },
-    { latex: "y = \\sqrt{x}", description: "Square Root", hint: "Only exists for positive x." },
-    { latex: "y = \\round{x}", description: "_ - ", hint: "You Spin Me Round" }
+    { latex: "y = \\operatorname{round}(x)", description: "Rounding Function", hint: "A step function that jumps at .5 intervals." }
   ],
-
   [GameDifficulty.MEDIUM]: [
     { latex: "y = \\sin(x) + x", description: "Sloped Wave", hint: "A wave climbing up a hill." },
     { latex: "y = \\frac{x}{x-1}", description: "Rational Function", hint: "Vertical asymptote at x=1." },
@@ -21,17 +22,21 @@ export const QUESTIONS: Record<GameDifficulty, MysteryFunction[]> = {
       latex: "y = x^x",
       description: "Self-Powered Curve",
       hint: "Explodes extremely fast; has a minimum for x > 0 from derivative."
-    }
+    },
   ],
-
   [GameDifficulty.HARD]: [
+    {
+      latex: "y = \\operatorname{abs}(\\sin(x)) + \\ln(x)",
+      description: "Absolute Sine with Log",
+      hint: "Starts only for x > 0; oscillations sit on top of a rising log curve."
+    },
     {
       latex: "(x^2 + y^2 - 1)^3 = x^2 y^3",
       description: "Heart Curve",
       hint: "A classic heart shape."
     },
     {
-      latex: "y = x^2 \\ln x",
+      latex: "y = x^2 \\ln(x)",
       description: "Quadratic Times Log",
       hint: "Negative until x > 1; derivative gives a point of fastest growth."
     },
@@ -46,17 +51,11 @@ export const QUESTIONS: Record<GameDifficulty, MysteryFunction[]> = {
       hint: "A smooth star-like curve with 4 rounded corners."
     },
     {
-      latex: "y = \\abs(\\sin x) + \\ln x",
-      description: "Absolute Sine with Log",
-      hint: "Starts only for x > 0; oscillations sit on top of a rising log curve."
-    },
-    {
-      latex: "y = \\frac{1}{x} + \\sin x",
+      latex: "y = \\frac{1}{x} + \\sin(x)",
       description: "Sinusoid on a Decaying Envelope",
       hint: "Vertical asymptote at 0; oscillations shrink asymptotically."
     }
   ],
-
   [GameDifficulty.EXTREME]: [
     {
       latex: "\\sin(xy) = 0.5",
@@ -64,7 +63,7 @@ export const QUESTIONS: Record<GameDifficulty, MysteryFunction[]> = {
       hint: "Repeating structure based on diagonal waves."
     },
     {
-      latex: "y = \\sqrt{x} - \\ln x",
+      latex: "y = \\sqrt{x} - \\ln(x)",
       description: "Root Minus Log",
       hint: "Crosses zero once; derivative shows a global minimum."
     }
