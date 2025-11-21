@@ -4,7 +4,6 @@ import { DesmosGraph } from './components/DesmosGraph';
 import { Button } from './components/Button';
 import { MathInput } from './components/MathInput';
 import { SyntaxGuide } from './components/SyntaxGuide';
-import { TestRunner } from './components/TestRunner'; 
 import { InfoModal } from './components/InfoModal';
 import { getMysteryFunction, getDifficultyFromLevel, initializeQuestions, getTotalLevels } from './services/questionService';
 import { validateGuessWithPython, initPyodide } from './services/pythonService';
@@ -26,7 +25,6 @@ const App: React.FC = () => {
   const [attempts, setAttempts] = useState<number>(0);
   const [pythonReady, setPythonReady] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
-  const [showTests, setShowTests] = useState(false);
   const [showInfo, setShowInfo] = useState(false); // State for InfoModal
 
   // Initialize Python Engine
@@ -200,7 +198,6 @@ const App: React.FC = () => {
   return (
     <div className="flex h-screen w-full bg-slate-950 text-slate-200 overflow-hidden">
       <SyntaxGuide isOpen={showHelp} onClose={() => setShowHelp(false)} />
-      {showTests && <TestRunner onClose={() => setShowTests(false)} />}
       <InfoModal isOpen={showInfo} onClose={() => setShowInfo(false)} />
       
       {/* Game Sidebar */}
@@ -433,15 +430,6 @@ const App: React.FC = () => {
                 </div>
              </div>
              
-             <div className="flex items-center justify-center gap-4 mt-3">
-                <button 
-                  onClick={() => setShowTests(true)} 
-                  className="text-[10px] text-slate-600 hover:text-slate-400 uppercase tracking-widest"
-                >
-                  Run Diagnostics
-                </button>
-             </div>
-
              {/* Info Button */}
              <button 
                 onClick={() => setShowInfo(true)}
