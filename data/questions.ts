@@ -3,7 +3,6 @@ import { GameDifficulty, MysteryFunction } from "../types";
 
 export const QUESTIONS: Record<GameDifficulty, MysteryFunction[]> = {
   [GameDifficulty.EASY]: [
-    { latex: "y = \\operatorname{round}(x)", description: "Rounding Function", hint: "A step function that jumps at .5 intervals." },
     { latex: "y = \\sqrt{x}", description: "Square Root", hint: "Only exists for positive x." },
     { latex: "y = \\operatorname{abs}(x)", description: "Absolute Value", hint: "V-shaped graph." },
     { latex: "y = x", description: "Identity Line", hint: "For every step right, you go one step up." },
@@ -11,7 +10,6 @@ export const QUESTIONS: Record<GameDifficulty, MysteryFunction[]> = {
     { latex: "y = \\sin(x)", description: "Sine Wave", hint: "Starts at 0, goes up to 1, down to -1." },
     { latex: "y = \\tan(x)", description: "Tangent", hint: "Repeating vertical asymptotes." },
     { latex: "y = 2x - 3", description: "Linear Equation", hint: "Slope is 2, y-intercept is -3." },
-    { latex: "y = \\operatorname{round}(x)", description: "Rounding Function", hint: "A step function that jumps at .5 intervals." }
   ],
   [GameDifficulty.MEDIUM]: [
     { latex: "y = \\sin(x) + x", description: "Sloped Wave", hint: "A wave climbing up a hill." },
